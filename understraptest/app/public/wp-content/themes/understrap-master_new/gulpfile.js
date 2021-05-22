@@ -1,28 +1,32 @@
 // Defining requirements
 
-var gulp = require( 'gulp' );
-var plumber = require( 'gulp-plumber' );
-var webpack = require( 'webpack' );
-var sass = require( 'gulp-sass' );
-var babel = require( 'gulp-babel' );
-var postcss = require( 'gulp-postcss' );
-var rename = require( 'gulp-rename' );
-var concat = require( 'gulp-concat' );
-var uglify = require( 'gulp-uglify' );
-var imagemin = require( 'gulp-imagemin' );
-var sourcemaps = require( 'gulp-sourcemaps' );
-var browserSync = require( 'browser-sync' ).create();
-var del = require( 'del' );
-var cleanCSS = require( 'gulp-clean-css' );
-var browserify = require( 'browserify' );
-var source = require( 'vinyl-source-stream' )
-var  livereload = require( 'gulp-livereload' );
-// var polyfill = require('babel-polyfill');
-
-var autoprefixer = require( 'autoprefixer' );
+var gulp = require('gulp');
+var plumber = require('gulp-plumber');
+var webpack = require('webpack');
+var sass = require('gulp-sass');
+var babel = require('gulp-babel');
+var postcss = require('gulp-postcss');
+var rename = require('gulp-rename');
+var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
+var imagemin = require('gulp-imagemin');
+var sourcemaps = require('gulp-sourcemaps');
+var browserSync = require('browser-sync').create();
+var del = require('del');
+var cleanCSS = require('gulp-clean-css');
+var browserify = require('browserify');
+var source = require('vinyl-source-stream')
+var livereload = require('gulp-livereload'),
+	rgba = require('postcss-hexrgba'),
+	autoprefixer = require('autoprefixer'),
+	cssvars = require('postcss-simple-vars'),
+	nested = require('postcss-nested'),
+	cssImport = require('postcss-import'),
+	mixins = require('postcss-mixins'),
+	colorFunctions = require('postcss-color-function');
 
 // Configuration file to keep your code DRY
-var cfg = require( './gulpconfig.json' );
+var cfg = require('./gulpconfig.json');
 
 var paths = cfg.paths;
 
@@ -43,24 +47,66 @@ gulp.task(
 	'sass',
 	function () {
 		return gulp
-		.src( paths.sass + '/*.scss' )
-		.pipe(
-			plumber(
-				{
-					errorHandler( err ) {
-						console.log( err );
-						this.emit( 'end' );
-					},
-				}
+			.src(paths.sass + '/*.scss')
+			.pipe(
+				plumber(
+					{
+						errorHandler(err) {
+							console.log(err);
+							this.emit('end');
+						},
+					}
+				)
 			)
-		)
-		.pipe( sourcemaps.init( { loadMaps: true } ) )
-		.pipe( sass( { errLogToConsole: true } ) )
-		.pipe( postcss( [autoprefixer()] ) )
-		.pipe( sourcemaps.write( undefined, { sourceRoot: null } ) )
-		.pipe( gulp.dest( paths.css ) );
+			.pipe(sourcemaps.init({ loadMaps: true }))
+			.pipe(sass({ errLogToConsole: true }))
+			.pipe(postcss([cssImport, autoprefixer]))
+			.pipe(sourcemaps.write(undefined, { sourceRoot: null }))
+			.pipe(gulp.dest(paths.css));
 	}
 );
+
+/* ------------- Modified Styles  */
+
+gulp.task(
+	'css-sass',
+	function () {
+		return gulp
+			.src([
+				paths.sass + '/*.css',
+				paths.sass + '/**/*.css',
+			]) //inside neto meron bootstrap SCSS, na papatakbuhin ni pipe(sass) -- ewan no need . follow this setup
+			.pipe(
+				plumber(
+					{
+						errorHandler(err) {
+							console.log(err);
+							this.emit('end');
+						},
+					}
+				)
+			)
+			.pipe(sourcemaps.init({ loadMaps: true }))
+			.pipe(postcss([cssImport, mixins, cssvars, nested, rgba, autoprefixer]))
+			// .pipe(sass({ errLogToConsole: true }))
+			.pipe(sourcemaps.write(undefined, { sourceRoot: null }))
+			.pipe(gulp.dest(paths.css));
+	}
+);
+
+
+
+gulp.task('sassy-styles', function () {
+	return gulp.src(paths.sass + '/*.css', paths.sass + '/*.scss')
+		.pipe(sass({ errLogToConsole: true }))
+		.pipe(postcss([cssImport, autoprefixer]))
+		.on('error', (error) => console.log(error.toString()))
+		.pipe(gulp.dest(paths.css));
+});
+
+
+/* ------------- Modified Styles end */
+
 
 /**
   * Optimizes images and copies images from src to dest.
@@ -70,33 +116,33 @@ gulp.task(
 gulp.task(
 	'imagemin',
 	() =>
-	gulp
-		.src( paths.imgsrc + '/**' )
-		.pipe(
-			imagemin(
-				[
-					// Bundled plugins
-					imagemin.gifsicle(
-						{
-							interlaced: true,
-							optimizationLevel: 3,
-						}
-					),
-					imagemin.mozjpeg(
-						{
-							quality: 100,
-							progressive: true,
-						}
-					),
-					imagemin.optipng(),
-					imagemin.svgo(),
-				],
-				{
-					verbose: true,
-				}
+		gulp
+			.src(paths.imgsrc + '/**')
+			.pipe(
+				imagemin(
+					[
+						// Bundled plugins
+						imagemin.gifsicle(
+							{
+								interlaced: true,
+								optimizationLevel: 3,
+							}
+						),
+						imagemin.mozjpeg(
+							{
+								quality: 100,
+								progressive: true,
+							}
+						),
+						imagemin.optipng(),
+						imagemin.svgo(),
+					],
+					{
+						verbose: true,
+					}
+				)
 			)
-		)
-		.pipe( gulp.dest( paths.img ) )
+			.pipe(gulp.dest(paths.img))
 );
 
 /**
@@ -108,39 +154,40 @@ gulp.task(
 	'minifycss',
 	function () {
 		return gulp
-		.src(
-			[
-			paths.css + '/custom-editor-style.css',
-			paths.css + '/theme.css',
-			]
-		)
-		.pipe(
-			sourcemaps.init(
-				{
-					loadMaps: true,
-				}
+			.src(
+				[
+					paths.css + '/custom-editor-style.css',
+					paths.css + '/fictional-styles.css',
+					paths.css + '/theme.css',
+				]
 			)
-		)
-		.pipe(
-			cleanCSS(
-				{
-					compatibility: '*',
-				}
+			.pipe(
+				sourcemaps.init(
+					{
+						loadMaps: true,
+					}
+				)
 			)
-		)
-		.pipe(
-			plumber(
-				{
-					errorHandler( err ) {
-						console.log( err );
-						this.emit( 'end' );
-					},
-				}
+			.pipe(
+				cleanCSS(
+					{
+						compatibility: '*',
+					}
+				)
 			)
-		)
-		.pipe( rename( { suffix: '.min' } ) )
-		.pipe( sourcemaps.write( './' ) )
-		.pipe( gulp.dest( paths.css ) );
+			.pipe(
+				plumber(
+					{
+						errorHandler(err) {
+							console.log(err);
+							this.emit('end');
+						},
+					}
+				)
+			)
+			.pipe(rename({ suffix: '.min' }))
+			.pipe(sourcemaps.write('./'))
+			.pipe(gulp.dest(paths.css));
 	}
 );
 
@@ -152,7 +199,7 @@ gulp.task(
 gulp.task(
 	'cleancss',
 	function () {
-		return del( paths.css + '/*.min.css*' );
+		return del(paths.css + '/*.min.css*');
 	}
 );
 
@@ -164,7 +211,8 @@ gulp.task(
 gulp.task(
 	'styles',
 	function (callback) {
-		gulp.series( 'sass', 'minifycss' )( callback );
+		gulp.series('sass', 'minifycss')(callback);
+
 	}
 );
 
@@ -179,25 +227,57 @@ gulp.task(
 	function () {
 		gulp.watch(
 			[paths.sass + '/*.scss', paths.sass + '/**/*.scss'],
-			gulp.series( 'styles' )
+			gulp.series('styles')
 		);
 		gulp.watch(
 			[
-			paths.dev + '/js/**/*.js', paths.dev + '/js/*.js', paths.dev + '/index.js',
-			'js/**/*.js',
-			'!js/theme.js',
-			'!js/theme.min.js',
+				paths.dev + '/js/**/*.js', paths.dev + '/js/*.js', paths.dev + '/index.js',
+				'js/**/*.js',
+				'!js/theme.js',
+				'!js/theme.min.js',
 			],
 			// ung argument value pala dito is ung (script) or (testscripts) - ung gulp caller name - kunyare watch-bs or styles or scripts
 			// gu 
-			gulp.series( 'testscripts', ['bs-reload', 'watch'] )
+			gulp.series('testscripts', ['bs-reload', 'watch'])
 		)
 
 		// Inside the watch task.
-		gulp.watch( paths.imgsrc + '/**', gulp.series( 'imagemin-watch' ) );
+		gulp.watch(paths.imgsrc + '/**', gulp.series('imagemin-watch'));
 
 	}
 );
+
+/*  Watch modified */
+
+gulp.task(
+	'watch-modified',
+	function () {
+		gulp.watch(
+			[paths.sass + '/*.css', paths.sass + '/**/*.css', paths.sass + '/*.scss', paths.sass + '/**/*.scss'],
+			gulp.series('css-sass', ['bs-reload'])  /*   */
+		);
+		gulp.watch(
+			[
+				paths.dev + '/js/**/*.js', 
+				paths.dev + '/js/*.js', 
+				paths.dev + '/index.js',
+				'js/**/*.js',
+				'!js/theme.js',
+				'!js/theme.min.js',
+			],
+			// ung argument value pala dito is ung (script) or (testscripts) - ung gulp caller name - kunyare watch-bs or styles or scripts
+			// gu 
+			gulp.series('testscripts', ['bs-reload', 'watch-modified'])
+		)
+
+		// Inside the watch task.
+		gulp.watch(paths.imgsrc + '/**', gulp.series('imagemin-watch'));
+
+	}
+);
+/*  Watch modified */
+
+
 
 /**
   * Starts browser-sync task for starting the server.
@@ -207,7 +287,7 @@ gulp.task(
 gulp.task(
 	'browser-sync',
 	function () {
-		browserSync.init( cfg.browserSyncOptions );
+		browserSync.init(cfg.browserSyncOptions);
 	}
 );
 
@@ -230,9 +310,8 @@ gulp.task(
   * 
   * Run: gulp watch-bs
   */
-gulp.task( 'watch-bs', gulp.parallel( 'browser-sync', 'watch', 'bs-reload' ) );
-
-
+gulp.task('watch-bs', gulp.parallel('browser-sync', 'watch'));
+gulp.task('watch-bs-v2', gulp.parallel('browser-sync', 'watch-modified'));
 
 // Run:
 // gulp scripts.
@@ -241,32 +320,32 @@ gulp.task(
 	'scripts',
 	function () {
 		var scripts = [
-		// Start - All BS4 stuff
-		// paths.dev + '/js/main.js',
-		paths.dev + '/js/bootstrap4/bootstrap.bundle.js',
-		// paths.dev + '/js/theme/*.js',
+			// Start - All BS4 stuff
+			// paths.dev + '/js/main.js',
+			paths.dev + '/js/bootstrap4/bootstrap.bundle.js',
+			// paths.dev + '/js/theme/*.js',
 
-		// End - All BS4 stuff
+			// End - All BS4 stuff
 
-		paths.dev + '/js/skip-link-focus-fix.js',
+			paths.dev + '/js/skip-link-focus-fix.js',
 
-		// paths.node + '/babel-polyfill/dist/polyfill.js', hula
-		// Adding currently empty javascript file to add on for your own themes´ customizations
-		// Please add any customizations to this .js file only!
-		// paths.dev + '/js/requirejs.js',
-		paths.dev + '/js/custom-javascript.js',
+			// paths.node + '/babel-polyfill/dist/polyfill.js', hula
+			// Adding currently empty javascript file to add on for your own themes´ customizations
+			// Please add any customizations to this .js file only!
+			// paths.dev + '/js/requirejs.js',
+			paths.dev + '/js/custom-javascript.js',
 		];
 		gulp
-		.src( scripts, { allowEmpty: true } )
-		.pipe( babel() )
-		.pipe( concat( 'theme.min.js' ) )
-		.pipe( gulp.dest( paths.js ) );
+			.src(scripts, { allowEmpty: true })
+			.pipe(babel())
+			.pipe(concat('theme.min.js'))
+			.pipe(gulp.dest(paths.js));
 
 		return gulp
-		.src( scripts, { allowEmpty: true } )
-		.pipe( babel() )
-		.pipe( concat( 'theme.js' ) )
-		.pipe( gulp.dest( paths.js ) );
+			.src(scripts, { allowEmpty: true })
+			.pipe(babel())
+			.pipe(concat('theme.js'))
+			.pipe(gulp.dest(paths.js));
 	}
 );
 
@@ -274,7 +353,7 @@ gulp.task(
 gulp.task(
 	'clean-source',
 	function () {
-		return del( ['src/**/*'] );
+		return del(['src/**/*']);
 	}
 );
 
@@ -289,25 +368,25 @@ gulp.task(
 		// All Bootstrap 4 Assets /////////////////////////
 		// Copy all JS files
 		var stream = gulp
-		.src( paths.node + '/bootstrap/dist/js/**/*.js' )
-		.pipe( gulp.dest( paths.dev + '/js/bootstrap4' ) );
+			.src(paths.node + '/bootstrap/dist/js/**/*.js')
+			.pipe(gulp.dest(paths.dev + '/js/bootstrap4'));
 
 		// Copy all Bootstrap SCSS files
 		gulp
-		.src( paths.node + '/bootstrap/scss/**/*.scss' )
-		.pipe( gulp.dest( paths.dev + '/sass/bootstrap4' ) );
+			.src(paths.node + '/bootstrap/scss/**/*.scss')
+			.pipe(gulp.dest(paths.dev + '/sass/bootstrap4'));
 
 		// End Bootstrap 4 Assets /////////////////////////
 
 		// Copy all Font Awesome Fonts
 		gulp
-		.src( paths.node + '/font-awesome/fonts/**/*.{ttf,woff,woff2,eot,svg}' )
-		.pipe( gulp.dest( paths.fonts ) );
+			.src(paths.node + '/font-awesome/fonts/**/*.{ttf,woff,woff2,eot,svg}')
+			.pipe(gulp.dest(paths.fonts));
 
 		// Copy all Font Awesome SCSS files
 		gulp
-		.src( paths.node + '/font-awesome/scss/*.scss' )
-		.pipe( gulp.dest( paths.dev + '/sass/fontawesome' ) );
+			.src(paths.node + '/font-awesome/scss/*.scss')
+			.pipe(gulp.dest(paths.dev + '/sass/fontawesome'));
 
 		done();
 	}
@@ -319,11 +398,11 @@ gulp.task(
 	function () {
 		return del(
 			[
-			paths.dev + '/js/bootstrap4',
-			paths.dev + '/sass/bootstrap4',
-			paths.fonts + '/*wesome*.{ttf,woff,woff2,eot,svg}',
-			paths.dev + '/sass/fontawesome',
-			paths.js + paths.vendor,
+				paths.dev + '/js/bootstrap4',
+				paths.dev + '/sass/bootstrap4',
+				paths.fonts + '/*wesome*.{ttf,woff,woff2,eot,svg}',
+				paths.dev + '/sass/fontawesome',
+				paths.js + paths.vendor,
 			]
 		);
 	}
@@ -337,7 +416,7 @@ gulp.task(
 gulp.task(
 	'clean-dist',
 	function () {
-		return del( paths.dist );
+		return del(paths.dist);
 	}
 );
 
@@ -350,28 +429,28 @@ gulp.task(
 		['clean-dist'],
 		function () {
 			return gulp
-			.src(
-				[
-					'**/*',
-					'!' + paths.node,
-					'!' + paths.node + '/**',
-					'!' + paths.dev,
-					'!' + paths.dev + '/**',
-					'!' + paths.dist,
-					'!' + paths.dist + '/**',
-					'!' + paths.distprod,
-					'!' + paths.distprod + '/**',
-					'!' + paths.sass,
-					'!' + paths.sass + '/**',
-					'!' + paths.composer,
-					'!' + paths.composer + '/**',
-					'!+(readme|README).+(txt|md)',
-					'!*.+(dist|json|js|lock|xml)',
-					'!CHANGELOG.md',
-				],
-				{ buffer: true }
-			)
-			.pipe( gulp.dest( paths.dist ) );
+				.src(
+					[
+						'**/*',
+						'!' + paths.node,
+						'!' + paths.node + '/**',
+						'!' + paths.dev,
+						'!' + paths.dev + '/**',
+						'!' + paths.dist,
+						'!' + paths.dist + '/**',
+						'!' + paths.distprod,
+						'!' + paths.distprod + '/**',
+						'!' + paths.sass,
+						'!' + paths.sass + '/**',
+						'!' + paths.composer,
+						'!' + paths.composer + '/**',
+						'!+(readme|README).+(txt|md)',
+						'!*.+(dist|json|js|lock|xml)',
+						'!CHANGELOG.md',
+					],
+					{ buffer: true }
+				)
+				.pipe(gulp.dest(paths.dist));
 		}
 	)
 );
@@ -384,7 +463,7 @@ gulp.task(
 gulp.task(
 	'clean-dist-product',
 	function () {
-		return del( paths.distprod );
+		return del(paths.distprod);
 	}
 );
 
@@ -397,38 +476,63 @@ gulp.task(
 		['clean-dist-product'],
 		function () {
 			return gulp
-			.src(
-				[
-				'**/*',
-				'!' + paths.node,
-				'!' + paths.node + '/**',
-				'!' + paths.composer,
-				'!' + paths.composer + '/**',
-				'!' + paths.dist,
-				'!' + paths.dist + '/**',
-				'!' + paths.distprod,
-				'!' + paths.distprod + '/**',
-				]
-			)
-			.pipe( gulp.dest( paths.distprod ) );
+				.src(
+					[
+						'**/*',
+						'!' + paths.node,
+						'!' + paths.node + '/**',
+						'!' + paths.composer,
+						'!' + paths.composer + '/**',
+						'!' + paths.dist,
+						'!' + paths.dist + '/**',
+						'!' + paths.distprod,
+						'!' + paths.distprod + '/**',
+					]
+				)
+				.pipe(gulp.dest(paths.distprod));
 		}
 	)
 );
 
+
+gulp.task(
+	'testscripts',
+	function (callback) {
+		return webpack(
+			require('./webpack.config.js'),
+			function (err, stats) {
+				if (err)
+				{
+					console.log(err.toString());
+				}
+
+				console.log(stats.toString());
+				callback();
+			}
+		);
+
+
+	}
+);
+
+
 // Run
 // gulp compile
 // Compiles the styles and scripts and runs the dist task
-gulp.task( 'compile', gulp.series( 'styles', 'scripts', 'dist' ) );
-gulp.task( 'dev', gulp.series( 'styles', 'scripts' ) );
+// gulp.task( 'compile', gulp.series( 'styles', 'scripts', 'dist' ) );
+// gulp.task( 'dev', gulp.series( 'styles', 'scripts' ) );
 
 
-gulp.task( 'dev-js', gulp.series( 'scripts' ) );
+// gulp.task( 'dev-gulp-webpack', gulp.series( 'styles', 'testscripts' ) );
+
+
+// gulp.task( 'dev-js', gulp.series( 'scripts' ) );
 
 
 // Run:
 // gulp
 // Starts watcher (default task)
-gulp.task( 'default', gulp.series( 'watch' ) );
+gulp.task('default', gulp.series('watch'));
 
 
 /*   only JS task   */
@@ -440,14 +544,14 @@ gulp.task(
 	function () {
 		var scripts = [
 
-		// Adding currently empty javascript file to add on for your own themes´ customizations
-		// Please add any customizations to this .js file only!
-		paths.dev + '/js/custom-javascript.js',
+			// Adding currently empty javascript file to add on for your own themes´ customizations
+			// Please add any customizations to this .js file only!
+			paths.dev + '/js/custom-javascript.js',
 		];
 		gulp
-		.src( scripts, { allowEmpty: true } )
-		.pipe( uglify() )
-		.pipe( gulp.dest( paths.js ) );
+			.src(scripts, { allowEmpty: true })
+			.pipe(uglify())
+			.pipe(gulp.dest(paths.js));
 
 		return gulp
 	}
@@ -460,10 +564,10 @@ gulp.task(
 	function () {
 		gulp.watch(
 			[
-			paths.dev + '/js/**/*.js', paths.dev + '/js/*.js',
-			'js/**/*.js',
-			'!js/theme.js',
-			'!js/theme.min.js',
+				paths.dev + '/js/**/*.js', paths.dev + '/js/*.js',
+				'js/**/*.js',
+				'!js/theme.js',
+				'!js/theme.min.js',
 			]
 		);
 	}
@@ -479,24 +583,6 @@ the idea is correct, but I need to abandon, because I dont know how to work this
 */
 
 
-gulp.task(
-	'testscripts',
-	function(callback) {
-		return webpack(
-			require( './webpack.config.js' ),
-			function(err, stats) {
-				if (err) {
-					console.log( err.toString() );
-				}
-  
-				console.log( stats.toString() );
-				callback();
-			}
-		);
-
-
-	}
-);
 
 
 
@@ -508,7 +594,7 @@ gulp.task(
 
 
 
-gulp.task( 'dev-watch-js', gulp.parallel( 'browser-sync', 'dev-watch' ) );
+gulp.task('dev-watch-js', gulp.parallel('browser-sync', 'dev-watch'));
 
 
 
@@ -532,10 +618,10 @@ gulp.task('js', function(){
 gulp.task(
 	'browserify',
 	function () {
-		return browserify( cfg.browserSyncOptions );
+		return browserify(cfg.browserSyncOptions);
 	}
 );
-gulp.task( 'dev-brow', gulp.parallel( 'browserify', 'watch' ) );
+gulp.task('dev-brow', gulp.parallel('browserify', 'watch'));
 
 // Basic usage
 // gulp.task('js', function() {

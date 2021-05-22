@@ -7183,12 +7183,12 @@ var Test = /*#__PURE__*/function () {
   _createClass(Test, [{
     key: "consoleMo",
     value: function consoleMo() {
-      console.log('Welcome beeekccss!');
+      console.log('wwweeee');
     }
   }, {
     key: "triggerMe",
     value: function triggerMe() {
-      console.log('makyuka!');
+      console.log('makyuksssa!');
     }
   }]);
 

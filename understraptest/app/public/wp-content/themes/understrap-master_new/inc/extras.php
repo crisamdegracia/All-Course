@@ -235,4 +235,7 @@ if ( ! function_exists( 'understrap_kses_title' ) ) {
 
 		return wp_kses( $data, $allowed_tags );
 	}
+	
 } // End of if function_exists( 'understrap_kses_title' ).
+
+

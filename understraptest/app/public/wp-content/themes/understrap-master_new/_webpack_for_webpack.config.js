@@ -142,7 +142,7 @@ module.exports = {
 	devServer: {
 	contentBase: path.join(__dirname),
 	public: "http://understraptest.local",
-	hot: true,
+	// hot: true,
 	open: true,
 	writeToDisk: true
 	}

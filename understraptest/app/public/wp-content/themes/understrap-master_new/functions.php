@@ -13,6 +13,7 @@ $understrap_inc_dir = get_template_directory() . '/inc';
 
 // Array of files to include.
 $understrap_includes = array(
+	'/fictional-university.php',
 	'/theme-settings.php',                  // Initialize theme default settings.
 	'/setup.php',                           // Theme setup and custom theme supports.
 	'/widgets.php',                         // Register widget area.
@@ -26,6 +27,7 @@ $understrap_includes = array(
 	'/class-wp-bootstrap-navwalker.php',    // Load custom WordPress nav walker. Trying to get deeper navigation? Check out: https://github.com/understrap/understrap/issues/567.
 	'/editor.php',                          // Load Editor functions.
 	'/deprecated.php',                      // Load deprecated functions.
+
 );
 
 // Load WooCommerce functions if WooCommerce is activated.
@@ -42,3 +44,5 @@ if ( class_exists( 'Jetpack' ) ) {
 foreach ( $understrap_includes as $file ) {
 	require_once $understrap_inc_dir . $file;
 }
+
+

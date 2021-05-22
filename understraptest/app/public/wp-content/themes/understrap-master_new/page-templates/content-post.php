@@ -1,20 +1,10 @@
-<?php 
-get_header();
-pageBanner(array(
-'title' => get_the_archive_title(),
-    'sub-title' => get_the_archive_description()
-    
-));
+ 
+        <!--
+this template part will be use in getting get_post_type()     
 
-?>
-    
-
-<div class="container container--narrow page-section">
-
-    <?php
-    while( have_posts()  ){
-        the_post(); ?>
-    <div class="post-item">
+ for the result page  
+-->
+       <div class="post-item">
         <h2 class="headline headline--medium headline--post-title"><a href=" <?php the_permalink() ?>" > <?php the_title(); ?> </a> </h2>
 
         <div class="metabox">
@@ -25,25 +15,3 @@ pageBanner(array(
             <p><a class="btn btn--blue" href="<?php the_permalink() ?>"> Continue reading &raquo; </a></p>
         </div>
     </div>
-    <?php
-    }
-    ?>
-
-
-    <?php echo paginate_links() ?>
-
-</div>    
-
-
-
-
-
-
-
-
-
-
-
-<?php 
-    get_footer();
-?>

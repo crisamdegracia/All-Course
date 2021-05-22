@@ -8,7 +8,7 @@
 // Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 ?>
-
+<h1>HELLO SEARCHFORM.PHP</h1>
 <form method="get" id="searchform" action="<?php echo esc_url( home_url( '/' ) ); ?>" role="search">
 	<label class="sr-only" for="s"><?php esc_html_e( 'Search', 'understrap' ); ?></label>
 	<div class="input-group">

@@ -69,7 +69,7 @@ get_header();
 				// 2nd arg - it can be named anything
 				// 2nd arg - parang kung single-[anyname].php
 				// gets moba?
-				get_template_part( 'template-parts/content', 'event' );
+				get_template_part( 'page-templates/content', 'event' );
 			}
 
 
@@ -164,13 +164,6 @@ get_header();
 		<div class="slider__bullets glide__bullets" data-glide-el="controls[nav]"></div>
 	</div>
 </div>
-
-
-
-
-
-
-
 
 
 

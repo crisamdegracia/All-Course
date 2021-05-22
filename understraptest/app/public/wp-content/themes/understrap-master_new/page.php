@@ -15,43 +15,92 @@ defined( 'ABSPATH' ) || exit;
 
 get_header();
 
-$container = get_theme_mod( 'understrap_container_type' );
 
+while (have_posts()){
+    the_post();
+    
+    pageBanner( array() );
+
+  
 ?>
-<h1 class="h1">We are page.php</h1>
-<div class="wrapper" id="page-wrapper">
 
-	<div class="<?php echo esc_attr( $container ); ?>" id="content" tabindex="-1">
+<div class="container container--narrow page-section">
+	
+    <?php
+    /* Get the ID of the parent page if meron. */
+    $parentPageID  = wp_get_post_parent_id( get_the_ID() );
 
-		<div class="row">
+    // if nasa child page tayo we will check here kung merong parent page 
+    // tapos yan ung magiging output
+    if (  $parentPageID  ) { ?>
 
-			<!-- Do the left sidebar check -->
-			<?php get_template_part( 'global-templates/left-sidebar-check' ); ?>
+    <div class="metabox metabox--position-up metabox--with-home-link">
+        <p><a class="metabox__blog-home-link" href="<?php echo get_the_permalink( $parentPageID) ?>"><i class="fa fa-home" aria-hidden="true"></i> Back to <?php echo get_the_title( $parentPageID ) ?></a> <span class="metabox__main"><?php the_title() ?></span></p>
 
-			<main class="site-main" id="main">
+    </div>
 
-				<?php
-				while ( have_posts() ) {
-					the_post();
-					get_template_part( 'loop-templates/content', 'page' );
 
-					// If comments are open or we have at least one comment, load up the comment template.
-					if ( comments_open() || get_comments_number() ) {
-						comments_template();
-					}
-				}
-				?>
+    <?php
+                           }
+    ?>
 
-			</main><!-- #main -->
 
-			<!-- Do the right sidebar check -->
-			<?php get_template_part( 'global-templates/right-sidebar-check' ); ?>
+    <?php 
 
-		</div><!-- .row -->
+    // $testArray's role here is to double check
+    //child_of - numerical ID of a certain page or post
+    // kung parehas merong parent page lalabas ung links sa gilid
+    $testArray = get_pages(array(
+        'child_of'  => get_the_ID()
+    ));
 
-	</div><!-- #content -->
+    //1st condition we test that 
+    //if parentPageID has an ID
+    //2nd condition is to check the child page
+    if( $parentPageID or $testArray ) { ?>
 
-</div><!-- #page-wrapper -->
+    <div class="page-links">
+        <h2 class="page-links__title"><a href="<?php echo get_the_permalink( $parentPageID ) ?>"><?php echo get_the_title($parentPageID) ?></a></h2>
+        <ul class="min-list">
 
-<?php
+            <?php 
+
+        if( $parentPageID ){
+            $findChildrenOf = $parentPageID;
+        } else {
+            $findChildrenOf = get_the_ID();
+        }
+
+                                       wp_list_pages( array(
+                                           //title_li is empty 
+                                           //child_of - numerical ID of a certain page or post
+                                           //sort_column => 'menu_order' we can choose the order output of link -
+                                           // ^ you can control this on right panel and choose the order number
+                                           'title_li' => NULL,
+                                           'child_of' => $findChildrenOf,
+                                           'sort_column' => 'menu_order'
+
+
+                                       ))   ?>
+
+        </ul>
+    </div>
+    <?php } ?>
+
+    <div class="generic-content">
+        <p><?php the_content(); ?></p>
+    </div>
+
+</div>
+
+
+
+<?php 
+}
+?>
+
+
+<?php 
+
 get_footer();
+?>

@@ -1,16 +1,13 @@
 import './js/fictional-university/scripts.js' 
-import 'bootstrap'
+// import './js/bootstrap4/bootstrap.bundle.min.js' 
+// import 'bootstrap'
 // import '../sass/theme.scss'
 // import '../sass/fictional-styles.scss'
 
 
-import Test from './js/custom-javascript.js';
+//THIS IS THE WEBPACK SOURCE FOR JS
 
-var test = new Test();
-
-test.triggerMe();
-
-console.log('123')
+console.log('41412412')
 
 
 

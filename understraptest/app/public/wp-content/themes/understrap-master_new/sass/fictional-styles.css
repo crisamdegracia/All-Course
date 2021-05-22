@@ -1,0 +1,32 @@
+@import "./theme/_theme_variables.scss"; /*  // <-------- Add your variables into this file. Also add variables to overwrite Bootstrap or UnderStrap variables here */
+
+/* @import "~bootstrap/scss/bootstrap";   */
+/* @import "../node_modules/bootstrap/dist/css/bootstrap.min.css"; */
+@import "../node_modules/normalize.css/normalize.css";
+@import "../node_modules/@glidejs/glide/dist/css/glide.core.min.css";
+@import "../node_modules/@glidejs/glide/dist/css/glide.theme.min.css";
+/* //Fictional University */
+
+@import "theme/fictional-university/base/_baseline.scss";
+@import "theme/fictional-university/base/_styles.scss";
+@import "theme/fictional-university/base/_utility-classes.scss";
+
+@import "theme/fictional-university/modules/_acf-map.scss";
+@import "theme/fictional-university/modules/_btn.scss";
+@import "theme/fictional-university/modules/_event-summary.scss";
+@import "theme/fictional-university/modules/_full-width-split.scss";
+@import "theme/fictional-university/modules/_generic-content.scss";
+@import "theme/fictional-university/modules/_headline.scss";
+@import "theme/fictional-university/modules/_hero-slider.scss";
+@import "theme/fictional-university/modules/_link-list.scss";
+@import "theme/fictional-university/modules/_login.scss";
+@import "theme/fictional-university/modules/_main-navigation.scss";
+@import "theme/fictional-university/modules/_my-notes.scss";
+@import "theme/fictional-university/modules/_page-banner.scss";
+@import "theme/fictional-university/modules/_page-links.scss";
+@import "theme/fictional-university/modules/_post-item.scss";
+@import "theme/fictional-university/modules/_professor-card.scss";
+@import "theme/fictional-university/modules/_search-overlay.scss";
+@import "theme/fictional-university/modules/_shame.scss";
+@import "theme/fictional-university/modules/_site-footer.scss";
+@import "theme/fictional-university/modules/_site-header.scss";
