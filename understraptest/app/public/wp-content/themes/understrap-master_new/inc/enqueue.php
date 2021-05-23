@@ -16,6 +16,9 @@ function understrap_scripts() {
 
 	//Fictional University fontawesome
 	wp_enqueue_style('font-awesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' );
+    
+	// To display Google Map in front-end
+	wp_enqueue_script('googleMap', '//maps.googleapis.com/maps/api/js?key=AIzaSyD-rsOXjG5-vXQEjd-YFC4zBBEEAb8tl6w', NULL, '1.0' , true  );
 
 
 	// Get the theme data.

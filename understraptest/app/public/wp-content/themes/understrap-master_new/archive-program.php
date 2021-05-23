@@ -2,7 +2,7 @@
 get_header();
 pageBanner(array(
     'title' => 'All Programs',
-    'sub-title' => 'There is something for everyone. Have a look around asdasd'
+    'sub-title' => 'There is something for everyone. Have a look around.'
 
 ))
 ?>
